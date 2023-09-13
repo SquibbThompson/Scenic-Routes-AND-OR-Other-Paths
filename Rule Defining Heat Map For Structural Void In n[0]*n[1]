@@ -23,3 +23,84 @@ def pad_with_zeros(binary_string):
 
     return array_2d
 binary_string = """
+
+##(n[0])*n([1]) array
+
+""".strip()
+
+
+
+padded_array = pad_with_zeros(binary_string)
+initial_grid = padded_array.copy()
+
+# Create a prerequisites grid
+prerequisites_grid = np.zeros_like(initial_grid)
+
+# Define custom colors for the specified prerequisites
+colors = [(0.4, 0, 0), (1, 0, 0), (1, 0.5, 0), (1, 1, 0), (0, 1, 0), (0, 0, 1), (0.5, 0, 0.5)]
+colormap = mcolors.LinearSegmentedColormap.from_list("", colors)
+
+# Function to get user input for active criteria
+def get_active_criteria():
+    while True:
+        criteria = input("Enter the active criteria necessary (comma-separated values from 0 to 8): ").strip().split(',')
+        criteria = [int(c) for c in criteria if c.isdigit() and 0 <= int(c) <= 8]
+        if criteria:
+            return criteria
+        else:
+            print("Invalid input. Please enter values from 0 to 8.")
+
+# Get user-defined criteria
+activation_matches = get_active_criteria()
+
+def evolve_grid(grid, activation_matches):
+    n, m = grid.shape
+    new_grid = grid.copy()
+    global prerequisites_grid
+
+    for i in range(n):
+        for j in range(m):
+            matches = 0
+            for x in range(-1, 2):
+                for y in range(-1, 2):
+                    if x == 0 and y == 0:
+                        continue
+
+                    ni, nj = (i + x) % n, (j + y) % m
+                    if grid[ni, nj]:
+                        matches += 1
+
+            # Update the prerequisites grid based on matches
+            prerequisites_grid[i, j] = matches
+
+            if grid[i, j] == 1 and matches not in activation_matches:
+                new_grid[i, j] = 0
+            elif grid[i, j] == 0 and matches in activation_matches:
+                new_grid[i, j] = 1
+
+    return new_grid
+
+# Parameters
+iterations = #Integer Val
+
+
+# Function to animate the grid evolution
+def animate(iteration):
+    global initial_grid
+    plt.clf()
+    plt.imshow(prerequisites_grid, cmap=colormap, vmin=0, vmax=8)
+    plt.axis('off')
+    plt.title(f'Heatmap (Frame: {iteration})')
+    initial_grid = evolve_grid(initial_grid, activation_matches)
+
+# Set up the animation
+fig = plt.figure(figsize=(10, 10))
+ani = animation.FuncAnimation(fig, animate, frames=iterations)
+
+# Save the animation as a GIF (optional)
+#Comment out save option for test
+
+######ani.save('Save_Option.gif', writer='pillow', fps=1.2)######
+
+# Display the animation
+plt.show()
