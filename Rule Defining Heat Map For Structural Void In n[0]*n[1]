@@ -1,0 +1,25 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import matplotlib.colors as mcolors
+
+
+def pad_with_zeros(binary_string):
+    # Convert the multi-line string to a list of lines
+    lines = binary_string.strip().split("\n")
+
+    # Convert each line to a list of integers
+    lines = [[int(ch) if ch != ' ' else 0 for ch in line.strip()] for line in lines]
+
+    # Find the maximum row length
+    max_row_length = max(len(row) for row in lines)
+
+    # Pad shorter rows with zeros
+    for row in lines:
+        row.extend([0] * (max_row_length - len(row)))
+
+    # Convert the list of lists to a NumPy array
+    array_2d = np.array(lines)
+
+    return array_2d
+binary_string = """
